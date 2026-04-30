@@ -1,10 +1,17 @@
-import { Button } from '@/components/ui/button';
+'use client';
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <h1 className="text-3xl font-bold">Fight House</h1>
-      <Button>Botão de teste</Button>
-    </main>
-  );
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { useAuth } from '@/hooks/use-auth';
+
+export default function HomePage() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (isLoading) return;
+    router.replace(isAuthenticated ? '/dashboard' : '/login');
+  }, [isAuthenticated, isLoading, router]);
+
+  return null;
 }
