@@ -31,3 +31,25 @@ export function formatTelefone(telefone: string): string {
   // Formato desconhecido: retorna como veio
   return telefone;
 }
+
+/**
+ * 'YYYY-MM-DD' → 'DD/MM/YYYY'
+ * Sem usar Date pra evitar problema de timezone.
+ */
+export function formatDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-');
+  return `${day}/${month}/${year}`;
+}
+
+/**
+ * 'YYYY-MM-DD' → 'mai/2026'
+ * Pra exibir mês de referência de mensalidade.
+ */
+export function formatMesReferencia(isoDate: string): string {
+  const [year, month] = isoDate.split('-');
+  const meses = [
+    'jan', 'fev', 'mar', 'abr', 'mai', 'jun',
+    'jul', 'ago', 'set', 'out', 'nov', 'dez',
+  ];
+  return `${meses[Number(month) - 1]}/${year}`;
+}
