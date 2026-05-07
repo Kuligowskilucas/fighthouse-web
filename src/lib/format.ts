@@ -4,3 +4,52 @@ export function formatCurrency(value: number): string {
     currency: 'BRL',
   });
 }
+
+/**
+ * Formata telefone brasileiro pra exibição.
+ * Backend manda só dígitos (5541999999999), aqui formatamos pra leitura.
+ */
+export function formatTelefone(telefone: string): string {
+  const digitos = telefone.replace(/\D/g, '');
+
+  // 13 dígitos: +55 (41) 99999-9999 (DDI + DDD + celular)
+  if (digitos.length === 13) {
+    return `+${digitos.slice(0, 2)} (${digitos.slice(2, 4)}) ${digitos.slice(4, 9)}-${digitos.slice(9)}`;
+  }
+  // 12 dígitos: +55 (41) 9999-9999 (DDI + DDD + fixo)
+  if (digitos.length === 12) {
+    return `+${digitos.slice(0, 2)} (${digitos.slice(2, 4)}) ${digitos.slice(4, 8)}-${digitos.slice(8)}`;
+  }
+  // 11 dígitos: (41) 99999-9999 (DDD + celular, sem DDI)
+  if (digitos.length === 11) {
+    return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`;
+  }
+  // 10 dígitos: (41) 9999-9999 (DDD + fixo, sem DDI)
+  if (digitos.length === 10) {
+    return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 6)}-${digitos.slice(6)}`;
+  }
+  // Formato desconhecido: retorna como veio
+  return telefone;
+}
+
+/**
+ * 'YYYY-MM-DD' → 'DD/MM/YYYY'
+ * Sem usar Date pra evitar problema de timezone.
+ */
+export function formatDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-');
+  return `${day}/${month}/${year}`;
+}
+
+/**
+ * 'YYYY-MM-DD' → 'mai/2026'
+ * Pra exibir mês de referência de mensalidade.
+ */
+export function formatMesReferencia(isoDate: string): string {
+  const [year, month] = isoDate.split('-');
+  const meses = [
+    'jan', 'fev', 'mar', 'abr', 'mai', 'jun',
+    'jul', 'ago', 'set', 'out', 'nov', 'dez',
+  ];
+  return `${meses[Number(month) - 1]}/${year}`;
+}
