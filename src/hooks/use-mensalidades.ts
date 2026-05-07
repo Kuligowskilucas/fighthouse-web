@@ -8,6 +8,17 @@ import type {
   Mensalidade,
 } from '@/types/mensalidade';
 
+import {
+  keepPreviousData,
+  useQuery,
+} from '@tanstack/react-query';
+
+import type {
+  MensalidadeComAluno,
+  StatusMensalidade,
+} from '@/types/mensalidade';
+import type { PaginatedResponse } from '@/types/pagination';
+
 export function useMarcarPagamento() {
   const queryClient = useQueryClient();
 
@@ -26,7 +37,6 @@ export function useMarcarPagamento() {
       return data.data;
     },
     onSuccess: () => {
-      // Invalida tudo que pode mostrar mensalidade
       queryClient.invalidateQueries({ queryKey: ['alunos'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['mensalidades'] });
@@ -49,5 +59,27 @@ export function useDesfazerPagamento() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['mensalidades'] });
     },
+  });
+}
+
+export interface MensalidadesListParams {
+  status?: StatusMensalidade;
+  mes_referencia?: string;
+  aluno_id?: number;
+  page?: number;
+  per_page?: number;
+}
+
+export function useMensalidadesList(params: MensalidadesListParams = {}) {
+  return useQuery({
+    queryKey: ['mensalidades', 'list', params],
+    queryFn: async (): Promise<PaginatedResponse<MensalidadeComAluno>> => {
+      const { data } = await api.get<PaginatedResponse<MensalidadeComAluno>>(
+        '/mensalidades',
+        { params },
+      );
+      return data;
+    },
+    placeholderData: keepPreviousData,
   });
 }

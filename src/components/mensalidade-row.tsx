@@ -22,10 +22,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useDesfazerPagamento } from '@/hooks/use-mensalidades';
 import { formatCurrency, formatDate, formatMesReferencia } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import type { Mensalidade } from '@/types/mensalidade';
+import type { Mensalidade, MensalidadeComAluno } from '@/types/mensalidade';
+
 
 interface MensalidadeRowProps {
-  mensalidade: Mensalidade;
+  mensalidade: Mensalidade | MensalidadeComAluno;
+  showAluno?: boolean;
 }
 
 const statusConfig = {
@@ -43,7 +45,8 @@ const statusConfig = {
   },
 } as const;
 
-export function MensalidadeRow({ mensalidade }: MensalidadeRowProps) {
+export function MensalidadeRow({ mensalidade, showAluno = false }: MensalidadeRowProps) {
+  const aluno = 'aluno' in mensalidade ? mensalidade.aluno : null;
   const [marcarOpen, setMarcarOpen] = useState(false);
   const [desfazerOpen, setDesfazerOpen] = useState(false);
   const desfazerMutation = useDesfazerPagamento();
@@ -77,8 +80,10 @@ export function MensalidadeRow({ mensalidade }: MensalidadeRowProps) {
         <CardContent className="flex items-center justify-between gap-3 p-3">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <p className="font-medium text-gray-900">
-                {formatMesReferencia(mensalidade.mes_referencia)}
+              <p className="truncate font-medium text-gray-900">
+                {showAluno && aluno
+                  ? `${aluno.nome} · ${formatMesReferencia(mensalidade.mes_referencia)}`
+                  : formatMesReferencia(mensalidade.mes_referencia)}
               </p>
               <Badge className={cn('shrink-0', config.badgeClass)}>
                 {config.label}

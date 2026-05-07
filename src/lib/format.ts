@@ -53,3 +53,22 @@ export function formatMesReferencia(isoDate: string): string {
   ];
   return `${meses[Number(month) - 1]}/${year}`;
 }
+
+/**
+ * Gera lista de meses pra select: últimos 12 + atual.
+ * Retorna [{value: 'YYYY-MM-DD', label: 'mai/2026'}, ...] do mais recente pro mais antigo.
+ */
+export function gerarOpcoesMeses(): Array<{ value: string; label: string }> {
+  const meses = [];
+  const hoje = new Date();
+
+  for (let i = 0; i < 12; i++) {
+    const data = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const value = `${ano}-${mes}-01`;
+    meses.push({ value, label: formatMesReferencia(value) });
+  }
+
+  return meses;
+}
