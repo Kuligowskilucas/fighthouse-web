@@ -1,3 +1,5 @@
+import type { Aluno } from '@/types/aluno';
+
 export type FormaPagamento = 'pix' | 'dinheiro' | 'cartao' | 'transferencia';
 
 export type StatusMensalidade = 'aberta' | 'paga' | 'atrasada';
@@ -20,4 +22,13 @@ export interface MarcarPagamentoPayload {
   data_pagamento: string; // 'YYYY-MM-DD'
   forma_pagamento: FormaPagamento;
   observacoes: string | null;
+}
+
+/**
+ * Mensalidade com aluno embedded.
+ * Vem assim quando lista é carregada via /api/mensalidades
+ * (controller faz ->with('aluno.plano'))
+ */
+export interface MensalidadeComAluno extends Mensalidade {
+  aluno: Aluno;
 }
