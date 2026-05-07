@@ -1,3 +1,5 @@
+import type { Mensalidade } from '@/types/mensalidade';
+
 export interface Plano {
   id: number;
   nome: string;
@@ -24,19 +26,6 @@ export interface Aluno {
   updated_at: string;
 }
 
-export interface Mensalidade {
-  id: number;
-  aluno_id: number;
-  mes_referencia: string;
-  valor: number;
-  data_vencimento: string;
-  data_pagamento: string | null;
-  forma_pagamento: 'pix' | 'dinheiro' | 'cartao' | null;
-  status: 'aberta' | 'paga' | 'atrasada';
-  observacoes: string | null;
-  created_at: string;
-  updated_at: string;
-}
 
 export interface AlunoDetalhe extends Aluno {
   mensalidades: Mensalidade[];
