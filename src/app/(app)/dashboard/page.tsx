@@ -7,6 +7,7 @@ import { InadimplenteRow } from '@/components/inadimplente-row';
 import { MetricCard } from '@/components/metric-card';
 import { useDashboardResumo, useInadimplentes } from '@/hooks/use-dashboard';
 import { formatCurrency } from '@/lib/format';
+import { ErrorState } from '@/components/error-state';
 
 export default function DashboardPage() {
   const resumoQuery = useDashboardResumo();
@@ -20,10 +21,14 @@ export default function DashboardPage() {
 
   if (resumoQuery.isError || inadimplentesQuery.isError) {
     return (
-      <div className="space-y-2 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-        <p className="font-medium">Erro ao carregar dashboard</p>
-        <p>Tenta recarregar a página. Se persistir, confere se o backend tá no ar.</p>
-      </div>
+      <ErrorState
+        title="Erro ao carregar dashboard"
+        message="Confere se o backend tá no ar e tenta de novo."
+        onRetry={() => {
+          resumoQuery.refetch();
+          inadimplentesQuery.refetch();
+        }}
+      />
     );
   }
 

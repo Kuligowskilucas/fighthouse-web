@@ -83,3 +83,34 @@ export function useMensalidadesList(params: MensalidadesListParams = {}) {
     placeholderData: keepPreviousData,
   });
 }
+
+export interface GerarMensalidadesPayload {
+  mes_referencia?: string;
+}
+
+export interface GerarMensalidadesResponse {
+  criadas: number;
+  ignoradas: number;
+  mes_referencia: string;
+}
+
+export function useGerarMensalidades() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (
+      payload: GerarMensalidadesPayload = {},
+    ): Promise<GerarMensalidadesResponse> => {
+      const { data } = await api.post<GerarMensalidadesResponse>(
+        '/mensalidades/gerar',
+        payload,
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['mensalidades'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['alunos'] });
+    },
+  });
+}

@@ -4,7 +4,6 @@ import { Plus, Search } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
 import { AlunoListItem } from '@/components/aluno-list-item';
 import { AlunosListSkeleton } from '@/components/alunos-list-skeleton';
 import { Pagination } from '@/components/pagination';
@@ -14,6 +13,8 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useAlunos } from '@/hooks/use-alunos';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
+import { ErrorState } from '@/components/error-state';
+
 
 export default function AlunosListPage() {
   const searchParams = useSearchParams();
@@ -61,7 +62,7 @@ export default function AlunosListPage() {
     router.replace(`${pathname}?${params.toString()}`);
   }
 
-  const { data, isLoading, isError } = useAlunos({
+  const { data, isLoading, isError, refetch } = useAlunos({
     search: search || undefined,
     ativo: incluirInativos ? undefined : true,
     page,
@@ -105,9 +106,10 @@ export default function AlunosListPage() {
       {isLoading ? (
         <AlunosListSkeleton />
       ) : isError ? (
-        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          Erro ao carregar alunos. Tenta recarregar a página.
-        </div>
+        <ErrorState
+          message="Não foi possível carregar a lista de alunos."
+          onRetry={() => refetch()}
+        />
       ) : !data || data.data.length === 0 ? (
         <div className="rounded-md border border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-600">
           {search ? 'Nenhum aluno encontrado.' : 'Nenhum aluno cadastrado ainda.'}
