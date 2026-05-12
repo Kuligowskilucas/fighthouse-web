@@ -39,6 +39,8 @@ import {
   useUpdateAluno,
 } from '@/hooks/use-alunos';
 import { formatCurrency, formatDate, formatTelefone } from '@/lib/format';
+import { ErrorState } from '@/components/error-state';
+
 
 type ConfirmAction = 'desativar' | 'reativar' | 'excluir' | null;
 
@@ -99,6 +101,10 @@ export default function AlunoDetailPage({ params }: AlunoDetailPageProps) {
   }
 
   if (alunoQuery.isError || !alunoQuery.data) {
+    const isNotFound =
+      alunoQuery.error instanceof AxiosError &&
+      alunoQuery.error.response?.status === 404;
+    
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-2">
@@ -109,9 +115,17 @@ export default function AlunoDetailPage({ params }: AlunoDetailPageProps) {
           </Button>
           <h1 className="text-2xl font-bold">Aluno</h1>
         </div>
-        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          Aluno não encontrado.
-        </div>
+        {isNotFound ? (
+          <ErrorState
+            title="Aluno não encontrado"
+            message="Esse aluno não existe ou foi excluído."
+          />
+        ) : (
+          <ErrorState
+            message="Não foi possível carregar os dados do aluno."
+            onRetry={() => alunoQuery.refetch()}
+          />
+        )}
       </div>
     );
   }

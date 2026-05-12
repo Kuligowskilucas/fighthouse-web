@@ -59,10 +59,10 @@ export function formatMesReferencia(isoDate: string): string {
  * Retorna [{value: 'YYYY-MM-DD', label: 'mai/2026'}, ...] do mais recente pro mais antigo.
  */
 export function gerarOpcoesMeses(): Array<{ value: string; label: string }> {
-  const meses = [];
+  const meses: Array<{ value: string; label: string }> = [];
   const hoje = new Date();
 
-  for (let i = 0; i < 12; i++) {
+  for (let i = -2; i <= 11; i++) {
     const data = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
     const ano = data.getFullYear();
     const mes = String(data.getMonth() + 1).padStart(2, '0');
