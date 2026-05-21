@@ -32,7 +32,14 @@ export default function LoginPage() {
     },
     onSuccess: (data) => {
       login(data.token, data.user);
-      router.push('/dashboard');
+
+      if (data.user.role === 'aluno') {
+        router.push('/meu-perfil');
+      } else if (data.user.role === 'professor') {
+        router.push('/alunos');     
+      } else {
+        router.push('/dashboard');   
+      }
     },
     onError: (error) => {
       if (error instanceof AxiosError) {

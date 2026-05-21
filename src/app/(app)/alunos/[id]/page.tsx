@@ -40,6 +40,7 @@ import {
 } from '@/hooks/use-alunos';
 import { formatCurrency, formatDate, formatTelefone } from '@/lib/format';
 import { ErrorState } from '@/components/error-state';
+import { RoleGuard } from '@/components/role-guard';
 
 
 type ConfirmAction = 'desativar' | 'reativar' | 'excluir' | null;
@@ -135,198 +136,200 @@ export default function AlunoDetailPage({ params }: AlunoDetailPageProps) {
   const isMutating = updateMutation.isPending || deleteMutation.isPending;
 
   return (
-    <div className="space-y-5">
-      {/* Header */}
-      <div className="flex items-center gap-2">
-        <Button asChild variant="ghost" size="icon">
-          <Link href="/alunos" aria-label="Voltar">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-        </Button>
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <h1 className="truncate text-2xl font-bold">{aluno.nome}</h1>
-          {!aluno.ativo && (
-            <Badge variant="secondary" className="shrink-0">
-              Inativo
-            </Badge>
-          )}
+    <RoleGuard allowedRoles={['admin', 'professor']}>
+      <div className="space-y-5">
+        {/* Header */}
+        <div className="flex items-center gap-2">
+          <Button asChild variant="ghost" size="icon">
+            <Link href="/alunos" aria-label="Voltar">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <h1 className="truncate text-2xl font-bold">{aluno.nome}</h1>
+            {!aluno.ativo && (
+              <Badge variant="secondary" className="shrink-0">
+                Inativo
+              </Badge>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Ações */}
-      <div className="flex flex-wrap gap-2">
-        <Button asChild size="sm" variant="outline">
-          <Link href={`/alunos/${id}/editar`}>
-            <Pencil className="h-4 w-4" />
-            Editar
-          </Link>
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => setConfirm(aluno.ativo ? 'desativar' : 'reativar')}
-          disabled={isMutating}
-        >
-          <Power className="h-4 w-4" />
-          {aluno.ativo ? 'Desativar' : 'Reativar'}
-        </Button>
-        {podeExcluir && (
+        {/* Ações */}
+        <div className="flex flex-wrap gap-2">
+          <Button asChild size="sm" variant="outline">
+            <Link href={`/alunos/${id}/editar`}>
+              <Pencil className="h-4 w-4" />
+              Editar
+            </Link>
+          </Button>
           <Button
             size="sm"
             variant="outline"
-            onClick={() => setConfirm('excluir')}
+            onClick={() => setConfirm(aluno.ativo ? 'desativar' : 'reativar')}
             disabled={isMutating}
-            className="text-red-600 hover:bg-red-50 hover:text-red-700"
           >
-            <Trash2 className="h-4 w-4" />
-            Excluir
+            <Power className="h-4 w-4" />
+            {aluno.ativo ? 'Desativar' : 'Reativar'}
           </Button>
-        )}
-      </div>
-
-      {/* Dados pessoais */}
-      <Card>
-        <CardContent className="space-y-3 p-4 text-sm">
-          <DataRow label="Telefone" value={formatTelefone(aluno.telefone)} />
-          {aluno.email && <DataRow label="E-mail" value={aluno.email} />}
-          <DataRow label="Plano" value={aluno.plano.nome} />
-          <DataRow
-            label="Valor"
-            value={
-              aluno.valor_personalizado != null
-                ? `${formatCurrency(aluno.valor_efetivo)} (personalizado)`
-                : formatCurrency(aluno.valor_efetivo)
-            }
-          />
-          <DataRow label="Vence todo dia" value={String(aluno.dia_vencimento)} />
-          <DataRow
-            label="Matriculado em"
-            value={`${formatDate(aluno.data_matricula)} (${aluno.dias_matriculado} dias)`}
-          />
-          {aluno.observacoes && (
-            <DataRow label="Observações" value={aluno.observacoes} />
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Resumo financeiro */}
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-900">Resumo financeiro</h2>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-          <MetricCard
-            label="Pagas"
-            value={String(aluno.resumo_financeiro.pagas)}
-            icon={CheckCircle}
-          />
-          <MetricCard
-            label="Em aberto"
-            value={String(aluno.resumo_financeiro.abertas)}
-            icon={Clock}
-          />
-          <MetricCard
-            label="Atrasadas"
-            value={String(aluno.resumo_financeiro.atrasadas)}
-            icon={AlertCircle}
-            variant={aluno.resumo_financeiro.atrasadas > 0 ? 'danger' : 'default'}
-          />
-        </div>
-        <p className="text-xs text-gray-500">
-          Total pago: {formatCurrency(aluno.resumo_financeiro.valor_total_pago)}
-        </p>
-      </section>
-
-      {/* Histórico de mensalidades */}
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-900">
-          Mensalidades ({aluno.mensalidades.length})
-        </h2>
-        {aluno.mensalidades.length === 0 ? (
-          <div className="flex items-center gap-3 rounded-md border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-            <CalendarDays className="h-4 w-4 shrink-0 text-gray-400" />
-            <p>Nenhuma mensalidade registrada ainda.</p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {aluno.mensalidades.map((m) => (
-              <MensalidadeRow key={m.id} mensalidade={m} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Confirmações */}
-      <AlertDialog
-        open={confirm === 'desativar'}
-        onOpenChange={(open) => !open && setConfirm(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Desativar aluno?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {aluno.nome} não vai mais aparecer na lista por padrão. Você pode
-              reativar a qualquer momento.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isMutating}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => handleToggleAtivo(false)}
+          {podeExcluir && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setConfirm('excluir')}
               disabled={isMutating}
+              className="text-red-600 hover:bg-red-50 hover:text-red-700"
             >
-              Desativar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog
-        open={confirm === 'reativar'}
-        onOpenChange={(open) => !open && setConfirm(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Reativar aluno?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {aluno.nome} vai voltar a aparecer na lista de ativos.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isMutating}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => handleToggleAtivo(true)}
-              disabled={isMutating}
-            >
-              Reativar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog
-        open={confirm === 'excluir'}
-        onOpenChange={(open) => !open && setConfirm(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Excluir aluno?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta ação não pode ser desfeita. {aluno.nome} será removido
-              permanentemente.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isMutating}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isMutating}
-              className="bg-red-600 hover:bg-red-700"
-            >
+              <Trash2 className="h-4 w-4" />
               Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+            </Button>
+          )}
+        </div>
+
+        {/* Dados pessoais */}
+        <Card>
+          <CardContent className="space-y-3 p-4 text-sm">
+            <DataRow label="Telefone" value={formatTelefone(aluno.telefone)} />
+            {aluno.email && <DataRow label="E-mail" value={aluno.email} />}
+            <DataRow label="Plano" value={aluno.plano.nome} />
+            <DataRow
+              label="Valor"
+              value={
+                aluno.valor_personalizado != null
+                  ? `${formatCurrency(aluno.valor_efetivo)} (personalizado)`
+                  : formatCurrency(aluno.valor_efetivo)
+              }
+            />
+            <DataRow label="Vence todo dia" value={String(aluno.dia_vencimento)} />
+            <DataRow
+              label="Matriculado em"
+              value={`${formatDate(aluno.data_matricula)} (${aluno.dias_matriculado} dias)`}
+            />
+            {aluno.observacoes && (
+              <DataRow label="Observações" value={aluno.observacoes} />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Resumo financeiro */}
+        <section className="space-y-3">
+          <h2 className="text-sm font-semibold text-gray-900">Resumo financeiro</h2>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <MetricCard
+              label="Pagas"
+              value={String(aluno.resumo_financeiro.pagas)}
+              icon={CheckCircle}
+            />
+            <MetricCard
+              label="Em aberto"
+              value={String(aluno.resumo_financeiro.abertas)}
+              icon={Clock}
+            />
+            <MetricCard
+              label="Atrasadas"
+              value={String(aluno.resumo_financeiro.atrasadas)}
+              icon={AlertCircle}
+              variant={aluno.resumo_financeiro.atrasadas > 0 ? 'danger' : 'default'}
+            />
+          </div>
+          <p className="text-xs text-gray-500">
+            Total pago: {formatCurrency(aluno.resumo_financeiro.valor_total_pago)}
+          </p>
+        </section>
+
+        {/* Histórico de mensalidades */}
+        <section className="space-y-3">
+          <h2 className="text-sm font-semibold text-gray-900">
+            Mensalidades ({aluno.mensalidades.length})
+          </h2>
+          {aluno.mensalidades.length === 0 ? (
+            <div className="flex items-center gap-3 rounded-md border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+              <CalendarDays className="h-4 w-4 shrink-0 text-gray-400" />
+              <p>Nenhuma mensalidade registrada ainda.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {aluno.mensalidades.map((m) => (
+                <MensalidadeRow key={m.id} mensalidade={m} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Confirmações */}
+        <AlertDialog
+          open={confirm === 'desativar'}
+          onOpenChange={(open) => !open && setConfirm(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Desativar aluno?</AlertDialogTitle>
+              <AlertDialogDescription>
+                {aluno.nome} não vai mais aparecer na lista por padrão. Você pode
+                reativar a qualquer momento.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isMutating}>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => handleToggleAtivo(false)}
+                disabled={isMutating}
+              >
+                Desativar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog
+          open={confirm === 'reativar'}
+          onOpenChange={(open) => !open && setConfirm(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Reativar aluno?</AlertDialogTitle>
+              <AlertDialogDescription>
+                {aluno.nome} vai voltar a aparecer na lista de ativos.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isMutating}>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => handleToggleAtivo(true)}
+                disabled={isMutating}
+              >
+                Reativar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog
+          open={confirm === 'excluir'}
+          onOpenChange={(open) => !open && setConfirm(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Excluir aluno?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação não pode ser desfeita. {aluno.nome} será removido
+                permanentemente.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isMutating}>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDelete}
+                disabled={isMutating}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Excluir
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </RoleGuard>
   );
 }
 

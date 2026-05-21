@@ -1,7 +1,11 @@
+export type UserRole = 'admin' | 'professor' | 'aluno';
+
 export interface User {
   id: number;
   name: string;
   email: string;
+  role: UserRole;
+  aluno_id: number | null;
 }
 
 export interface LoginRequest {

@@ -14,6 +14,7 @@ import { Switch } from '@/components/ui/switch';
 import { useAlunos } from '@/hooks/use-alunos';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { ErrorState } from '@/components/error-state';
+import { RoleGuard } from '@/components/role-guard';
 
 
 export default function AlunosListPage() {
@@ -69,61 +70,63 @@ export default function AlunosListPage() {
   });
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Alunos</h1>
-        <Button asChild size="sm">
-          <Link href="/alunos/novo">
-            <Plus className="h-4 w-4" />
-            Novo
-          </Link>
-        </Button>
-      </div>
-
-      <div className="space-y-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <Input
-            type="search"
-            placeholder="Buscar por nome ou telefone"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="pl-9"
-          />
+    <RoleGuard allowedRoles={['admin', 'professor']}>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-2xl font-bold">Alunos</h1>
+          <Button asChild size="sm">
+            <Link href="/alunos/novo">
+              <Plus className="h-4 w-4" />
+              Novo
+            </Link>
+          </Button>
         </div>
-        <div className="flex items-center gap-2">
-          <Switch
-            id="incluir-inativos"
-            checked={incluirInativos}
-            onCheckedChange={handleToggleInativos}
-          />
-          <Label htmlFor="incluir-inativos" className="text-sm text-gray-600">
-            Incluir inativos
-          </Label>
-        </div>
-      </div>
-
-      {isLoading ? (
-        <AlunosListSkeleton />
-      ) : isError ? (
-        <ErrorState
-          message="Não foi possível carregar a lista de alunos."
-          onRetry={() => refetch()}
-        />
-      ) : !data || data.data.length === 0 ? (
-        <div className="rounded-md border border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-600">
-          {search ? 'Nenhum aluno encontrado.' : 'Nenhum aluno cadastrado ainda.'}
-        </div>
-      ) : (
-        <>
-          <div className="space-y-2">
-            {data.data.map((aluno) => (
-              <AlunoListItem key={aluno.id} aluno={aluno} />
-            ))}
+    
+        <div className="space-y-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Input
+              type="search"
+              placeholder="Buscar por nome ou telefone"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="pl-9"
+            />
           </div>
-          <Pagination meta={data.meta} onPageChange={handlePageChange} />
-        </>
-      )}
-    </div>
+          <div className="flex items-center gap-2">
+            <Switch
+              id="incluir-inativos"
+              checked={incluirInativos}
+              onCheckedChange={handleToggleInativos}
+            />
+            <Label htmlFor="incluir-inativos" className="text-sm text-gray-600">
+              Incluir inativos
+            </Label>
+          </div>
+        </div>
+    
+        {isLoading ? (
+          <AlunosListSkeleton />
+        ) : isError ? (
+          <ErrorState
+            message="Não foi possível carregar a lista de alunos."
+            onRetry={() => refetch()}
+          />
+        ) : !data || data.data.length === 0 ? (
+          <div className="rounded-md border border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-600">
+            {search ? 'Nenhum aluno encontrado.' : 'Nenhum aluno cadastrado ainda.'}
+          </div>
+        ) : (
+          <>
+            <div className="space-y-2">
+              {data.data.map((aluno) => (
+                <AlunoListItem key={aluno.id} aluno={aluno} />
+              ))}
+            </div>
+            <Pagination meta={data.meta} onPageChange={handlePageChange} />
+          </>
+        )}
+      </div>
+    </RoleGuard>
   );
 }

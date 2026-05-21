@@ -35,6 +35,7 @@ import { Button } from '@/components/ui/button';
 import { useGerarMensalidades } from '@/hooks/use-mensalidades';
 import { formatMesReferencia } from '@/lib/format';
 import { ErrorState } from '@/components/error-state';
+import { RoleGuard } from '@/components/role-guard';
 
 
 
@@ -130,89 +131,91 @@ export default function MensalidadesPage() {
   });
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Mensalidades</h1>
-        <Button size="sm" variant="outline" onClick={() => setConfirmGerar(true)} disabled={gerarMutation.isPending}>
-          <CalendarPlus className="h-4 w-4" />
-          Gerar
-        </Button>
-      </div>
-
-      <div className="space-y-3">
-        <Select value={mes} onValueChange={handleMesChange}>
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {opcoesMeses.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Tabs value={tab} onValueChange={handleTabChange}>
-          <TabsList className="w-full">
-            {TABS.map((t) => (
-              <TabsTrigger key={t.value} value={t.value} className="flex-1">
-                {t.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-      </div>
-
-      {isLoading ? (
-        <AlunosListSkeleton />
-      ) : isError ? (
-        <ErrorState
-          message="Não foi possível carregar a lista de mensalidades."
-          onRetry={() => refetch()}
-        />
-      ) : !data || data.data.length === 0 ? (
-        <div className="rounded-md border border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-600">
-          Nenhuma mensalidade encontrada com esses filtros.
+    <RoleGuard allowedRoles={['admin', 'professor']}>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-2xl font-bold">Mensalidades</h1>
+          <Button size="sm" variant="outline" onClick={() => setConfirmGerar(true)} disabled={gerarMutation.isPending}>
+            <CalendarPlus className="h-4 w-4" />
+            Gerar
+          </Button>
         </div>
-      ) : (
-        <>
-          <div className="space-y-2">
-            {data.data.map((mensalidade) => (
-              <MensalidadeRow
-                key={mensalidade.id}
-                mensalidade={mensalidade}
-                showAluno
-              />
-            ))}
+    
+        <div className="space-y-3">
+          <Select value={mes} onValueChange={handleMesChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {opcoesMeses.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+            
+          <Tabs value={tab} onValueChange={handleTabChange}>
+            <TabsList className="w-full">
+              {TABS.map((t) => (
+                <TabsTrigger key={t.value} value={t.value} className="flex-1">
+                  {t.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+            
+        {isLoading ? (
+          <AlunosListSkeleton />
+        ) : isError ? (
+          <ErrorState
+            message="Não foi possível carregar a lista de mensalidades."
+            onRetry={() => refetch()}
+          />
+        ) : !data || data.data.length === 0 ? (
+          <div className="rounded-md border border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-600">
+            Nenhuma mensalidade encontrada com esses filtros.
           </div>
-          <Pagination meta={data.meta} onPageChange={handlePageChange} />
-        </>
-      )}
-      <AlertDialog open={confirmGerar} onOpenChange={setConfirmGerar}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              Gerar mensalidades de {formatMesReferencia(mes)}?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              Vai criar uma mensalidade pra cada aluno ativo que ainda não tem
-              mensalidade nesse mês. Alunos que já têm são ignorados.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={gerarMutation.isPending}>
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleGerar}
-              disabled={gerarMutation.isPending}
-            >
-              {gerarMutation.isPending ? 'Gerando...' : 'Gerar'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+        ) : (
+          <>
+            <div className="space-y-2">
+              {data.data.map((mensalidade) => (
+                <MensalidadeRow
+                  key={mensalidade.id}
+                  mensalidade={mensalidade}
+                  showAluno
+                />
+              ))}
+            </div>
+            <Pagination meta={data.meta} onPageChange={handlePageChange} />
+          </>
+        )}
+        <AlertDialog open={confirmGerar} onOpenChange={setConfirmGerar}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Gerar mensalidades de {formatMesReferencia(mes)}?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Vai criar uma mensalidade pra cada aluno ativo que ainda não tem
+                mensalidade nesse mês. Alunos que já têm são ignorados.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={gerarMutation.isPending}>
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleGerar}
+                disabled={gerarMutation.isPending}
+              >
+                {gerarMutation.isPending ? 'Gerando...' : 'Gerar'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </RoleGuard>
   );
 }

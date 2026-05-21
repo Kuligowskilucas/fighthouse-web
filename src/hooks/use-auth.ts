@@ -8,9 +8,6 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Carrega user do localStorage no mount.
-  // Precisa ser useEffect pra evitar hydration mismatch:
-  // no servidor o user é sempre null, no cliente pode ser diferente.
   useEffect(() => {
     setUser(authStorage.getUser());
     setIsLoading(false);
@@ -30,6 +27,9 @@ export function useAuth() {
     user,
     isAuthenticated: user !== null,
     isLoading,
+    isAdmin:     user?.role === 'admin',
+    isProfessor: user?.role === 'professor',
+    isAluno:     user?.role === 'aluno',
     login,
     logout,
   };
