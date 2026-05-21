@@ -14,6 +14,7 @@ import { useAluno, useUpdateAluno } from '@/hooks/use-alunos';
 import type { AlunoFormValues } from '@/schemas/aluno';
 import type { UpdateAlunoPayload } from '@/types/aluno';
 import type { LaravelValidationError } from '@/types/auth';
+import { RoleGuard } from '@/components/role-guard';
 
 interface EditarAlunoPageProps {
   params: Promise<{ id: string }>;
@@ -117,23 +118,25 @@ export default function EditarAlunoPage({ params }: EditarAlunoPageProps) {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Button asChild variant="ghost" size="icon">
-          <Link href={`/alunos/${id}`} aria-label="Voltar">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-        </Button>
-        <h1 className="text-2xl font-bold">Editar aluno</h1>
-      </div>
+    <RoleGuard allowedRoles={['admin', 'professor']}>
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Button asChild variant="ghost" size="icon">
+            <Link href={`/alunos/${id}`} aria-label="Voltar">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <h1 className="text-2xl font-bold">Editar aluno</h1>
+        </div>
 
-      <AlunoForm
-        defaultValues={formDefaults}
-        onSubmit={handleSubmit}
-        submitLabel="Salvar alterações"
-        isSubmitting={updateMutation.isPending}
-        apiErrors={apiErrors}
-      />
-    </div>
+        <AlunoForm
+          defaultValues={formDefaults}
+          onSubmit={handleSubmit}
+          submitLabel="Salvar alterações"
+          isSubmitting={updateMutation.isPending}
+          apiErrors={apiErrors}
+        />
+      </div>
+    </RoleGuard>
   );
 }

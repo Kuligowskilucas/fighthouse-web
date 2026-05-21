@@ -13,6 +13,7 @@ import { useCreateAluno } from '@/hooks/use-alunos';
 import type { AlunoFormValues } from '@/schemas/aluno';
 import type { CreateAlunoPayload } from '@/types/aluno';
 import type { LaravelValidationError } from '@/types/auth';
+import { RoleGuard } from '@/components/role-guard';
 
 export default function NovoAlunoPage() {
   const router = useRouter();
@@ -54,22 +55,24 @@ export default function NovoAlunoPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Button asChild variant="ghost" size="icon">
-          <Link href="/alunos" aria-label="Voltar">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-        </Button>
-        <h1 className="text-2xl font-bold">Novo aluno</h1>
+    <RoleGuard allowedRoles={['admin', 'professor']}>
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Button asChild variant="ghost" size="icon">
+            <Link href="/alunos" aria-label="Voltar">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <h1 className="text-2xl font-bold">Novo aluno</h1>
+        </div>
+    
+        <AlunoForm
+          onSubmit={handleSubmit}
+          submitLabel="Cadastrar"
+          isSubmitting={createMutation.isPending}
+          apiErrors={apiErrors}
+        />
       </div>
-
-      <AlunoForm
-        onSubmit={handleSubmit}
-        submitLabel="Cadastrar"
-        isSubmitting={createMutation.isPending}
-        apiErrors={apiErrors}
-      />
-    </div>
+    </RoleGuard>
   );
 }

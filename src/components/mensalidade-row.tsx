@@ -28,6 +28,7 @@ import type { Mensalidade, MensalidadeComAluno } from '@/types/mensalidade';
 interface MensalidadeRowProps {
   mensalidade: Mensalidade | MensalidadeComAluno;
   showAluno?: boolean;
+  readOnly?: boolean;
 }
 
 const statusConfig = {
@@ -45,7 +46,7 @@ const statusConfig = {
   },
 } as const;
 
-export function MensalidadeRow({ mensalidade, showAluno = false }: MensalidadeRowProps) {
+export function MensalidadeRow({ mensalidade, showAluno = false, readOnly = false }: MensalidadeRowProps) {
   const aluno = 'aluno' in mensalidade ? mensalidade.aluno : null;
   const [marcarOpen, setMarcarOpen] = useState(false);
   const [desfazerOpen, setDesfazerOpen] = useState(false);
@@ -102,25 +103,29 @@ export function MensalidadeRow({ mensalidade, showAluno = false }: MensalidadeRo
               {formatCurrency(mensalidade.valor)}
             </p>
 
-            {isPaga ? (
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 text-gray-500 hover:text-gray-900"
-                onClick={() => setDesfazerOpen(true)}
-                aria-label="Desfazer pagamento"
-              >
-                <Undo2 className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setMarcarOpen(true)}
-              >
-                <Check className="h-4 w-4" />
-                Pagar
-              </Button>
+            {!readOnly && (
+              <>
+                {isPaga ? (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 text-gray-500 hover:text-gray-900"
+                    onClick={() => setDesfazerOpen(true)}
+                    aria-label="Desfazer pagamento"
+                  >
+                    <Undo2 className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setMarcarOpen(true)}
+                  >
+                    <Check className="h-4 w-4" />
+                    Pagar
+                  </Button>
+                )}
+              </>
             )}
           </div>
         </CardContent>
