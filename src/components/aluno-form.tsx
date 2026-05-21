@@ -36,6 +36,7 @@ const formDefaults: AlunoFormValues = {
   valor_personalizado: '',
   dia_vencimento: 5,
   data_matricula: new Date().toISOString().split('T')[0],
+  horario_treino: '',
   observacoes: '',
 };
 
@@ -207,6 +208,25 @@ export function AlunoForm({
               <FormControl>
                 <Input type="date" {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="horario_treino"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Horário de treino</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="ex: Seg/Qua/Sex 19h"
+                  autoCapitalize="none"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>Quando o aluno costuma treinar (opcional)</FormDescription>
               <FormMessage />
             </FormItem>
           )}

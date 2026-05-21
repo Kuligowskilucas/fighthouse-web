@@ -1,5 +1,3 @@
-// import type { Aluno } from '@/types/aluno';
-
 export interface DashboardResumo {
   mes_referencia: string;
   alunos_ativos: number;
@@ -37,4 +35,26 @@ export interface InadimplentesResponse {
   data: InadimplenteItem[];
   total_alunos_inadimplentes: number;
   valor_total_devido: number;
+}
+
+export interface RecebidoHojeItem {
+  id: number;
+  aluno_id: number;
+  aluno: {
+    id: number;
+    nome: string;
+    telefone: string;
+    email: string | null;
+  };
+  mes_referencia: string;
+  valor: number;
+  data_pagamento: string;
+  forma_pagamento: 'pix' | 'dinheiro' | 'cartao' | 'transferencia' | null;
+  observacoes: string | null;
+}
+
+export interface RecebidosHojeResponse {
+  data: RecebidoHojeItem[];
+  total_recebido: number;
+  quantidade: number;
 }

@@ -21,6 +21,22 @@ export function DashboardSkeleton() {
         ))}
       </div>
 
+      {/* Recebidos hoje */}
+      <div className="space-y-3">
+        <Skeleton className="h-5 w-40" />
+        {Array.from({ length: 2 }).map((_, i) => (
+          <Card key={i}>
+            <CardContent className="flex items-center justify-between gap-3 p-4">
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+              <Skeleton className="h-5 w-16 shrink-0" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       {/* Inadimplentes */}
       <div className="space-y-3">
         <Skeleton className="h-5 w-40" />

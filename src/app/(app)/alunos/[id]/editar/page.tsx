@@ -44,6 +44,7 @@ export default function EditarAlunoPage({ params }: EditarAlunoPageProps) {
           : Number(values.valor_personalizado),
       dia_vencimento: values.dia_vencimento,
       data_matricula: values.data_matricula,
+      horario_treino: values.horario_treino.trim() || null,
       observacoes: values.observacoes.trim() || null,
     };
 
@@ -114,6 +115,7 @@ export default function EditarAlunoPage({ params }: EditarAlunoPageProps) {
         : '',
     dia_vencimento: aluno.dia_vencimento,
     data_matricula: aluno.data_matricula,
+    horario_treino: aluno.horario_treino ?? '',
     observacoes: aluno.observacoes ?? '',
   };
 
