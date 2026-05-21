@@ -205,6 +205,9 @@ export default function AlunoDetailPage({ params }: AlunoDetailPageProps) {
               label="Matriculado em"
               value={`${formatDate(aluno.data_matricula)} (${aluno.dias_matriculado} dias)`}
             />
+            {aluno.horario_treino && (
+              <DataRow label="Horário de treino" value={aluno.horario_treino} />
+            )}
             {aluno.observacoes && (
               <DataRow label="Observações" value={aluno.observacoes} />
             )}

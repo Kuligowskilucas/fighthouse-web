@@ -3,7 +3,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 
-import type { DashboardResumo, InadimplentesResponse } from '@/types/dashboard';
+import type {
+  DashboardResumo,
+  InadimplentesResponse,
+  RecebidosHojeResponse,
+} from '@/types/dashboard';
 
 export function useDashboardResumo() {
   return useQuery({
@@ -21,6 +25,18 @@ export function useInadimplentes() {
     queryFn: async (): Promise<InadimplentesResponse> => {
       const { data } = await api.get<InadimplentesResponse>(
         '/dashboard/inadimplentes',
+      );
+      return data;
+    },
+  });
+}
+
+export function useRecebidosHoje() {
+  return useQuery({
+    queryKey: ['dashboard', 'recebidos-hoje'],
+    queryFn: async (): Promise<RecebidosHojeResponse> => {
+      const { data } = await api.get<RecebidosHojeResponse>(
+        '/dashboard/recebidos-hoje',
       );
       return data;
     },

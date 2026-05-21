@@ -19,13 +19,13 @@ export interface Aluno {
   valor_efetivo: number;
   dia_vencimento: number;
   data_matricula: string;
+  horario_treino: string | null;
   dias_matriculado: number;
   ativo: boolean;
   observacoes: string | null;
   created_at: string;
   updated_at: string;
 }
-
 
 export interface AlunoDetalhe extends Aluno {
   mensalidades: Mensalidade[];
@@ -47,6 +47,7 @@ export interface CreateAlunoPayload {
   valor_personalizado: number | null;
   dia_vencimento: number;
   data_matricula: string;
+  horario_treino: string | null;
   observacoes: string | null;
 }
 

@@ -34,6 +34,7 @@ export default function NovoAlunoPage() {
           : Number(values.valor_personalizado),
       dia_vencimento: values.dia_vencimento,
       data_matricula: values.data_matricula,
+      horario_treino: values.horario_treino.trim() || null,
       observacoes: values.observacoes.trim() || null,
     };
 
@@ -65,7 +66,7 @@ export default function NovoAlunoPage() {
           </Button>
           <h1 className="text-2xl font-bold">Novo aluno</h1>
         </div>
-    
+
         <AlunoForm
           onSubmit={handleSubmit}
           submitLabel="Cadastrar"
