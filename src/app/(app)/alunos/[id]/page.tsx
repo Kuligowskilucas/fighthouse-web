@@ -132,7 +132,6 @@ export default function AlunoDetailPage({ params }: AlunoDetailPageProps) {
   }
 
   const aluno = alunoQuery.data;
-  const podeExcluir = aluno.resumo_financeiro.total_mensalidades === 0;
   const isMutating = updateMutation.isPending || deleteMutation.isPending;
 
   return (
@@ -172,7 +171,6 @@ export default function AlunoDetailPage({ params }: AlunoDetailPageProps) {
             <Power className="h-4 w-4" />
             {aluno.ativo ? 'Desativar' : 'Reativar'}
           </Button>
-          {podeExcluir && (
             <Button
               size="sm"
               variant="outline"
@@ -183,7 +181,7 @@ export default function AlunoDetailPage({ params }: AlunoDetailPageProps) {
               <Trash2 className="h-4 w-4" />
               Excluir
             </Button>
-          )}
+          
         </div>
 
         {/* Dados pessoais */}
@@ -315,8 +313,8 @@ export default function AlunoDetailPage({ params }: AlunoDetailPageProps) {
             <AlertDialogHeader>
               <AlertDialogTitle>Excluir aluno?</AlertDialogTitle>
               <AlertDialogDescription>
-                Esta ação não pode ser desfeita. {aluno.nome} será removido
-                permanentemente.
+                {aluno.nome} será excluído permanentemente junto com todo o histórico de mensalidades.
+                Para apenas remover da lista ativa, use o botão Desativar.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
