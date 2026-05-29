@@ -1,91 +1,91 @@
 # Fight House Web
 
-> Frontend de um sistema de gestão de mensalidades para academia de jiu-jitsu.
+> Frontend for a monthly fee management system for a jiu-jitsu gym.
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)
 ![Tailwind](https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss)
 
-Aplicação Next.js 16 com TypeScript e Tailwind v4, desenvolvida como projeto sem fins lucrativos para a Fight House Club. Interface mobile-first para cadastro de alunos, registro de pagamentos e visão financeira mensal.
+A Next.js 16 application built with TypeScript and Tailwind v4, developed as a non-profit project for Fight House Club. Mobile-first interface for student registration, payment tracking, and monthly financial overview.
 
-A API que este frontend consome está em [fighthouse-api](https://github.com/Kuligowskilucas/fighthouse-api).
+The API this frontend consumes is available at [fighthouse-api](https://github.com/Kuligowskilucas/fighthouse-api).
 
 ---
 
-## Sobre o projeto
+## About the project
 
-A Fight House Club é uma academia de jiu-jitsu cujo dono, Marquete, hoje gerencia as mensalidades dos ~30 alunos em um caderno físico. Este projeto é uma alternativa digital gratuita, construída com prioridade absoluta em uso mobile — Marquete vai usar muito mais o celular do que o desktop.
+Fight House Club is a jiu-jitsu gym whose owner, Marquete, currently manages monthly fees for ~30 students using a physical notebook. This project is a free digital alternative, built with absolute priority on mobile usage — Marquete will use it on his phone far more than on a desktop.
 
 ---
 
 ## Stack
 
-- **Next.js 16** com App Router e Turbopack
+- **Next.js 16** with App Router and Turbopack
 - **React 19** + **TypeScript**
-- **Tailwind CSS v4** + **shadcn/ui** (preset Nova)
-- **TanStack Query** para fetching e cache
-- **React Hook Form** + **Zod** para formulários
-- **Axios** com interceptor para autenticação Bearer
-- **Sonner** para notificações toast
-- **Lucide React** para ícones
+- **Tailwind CSS v4** + **shadcn/ui** (Nova preset)
+- **TanStack Query** for data fetching and caching
+- **React Hook Form** + **Zod** for forms
+- **Axios** with interceptor for Bearer authentication
+- **Sonner** for toast notifications
+- **Lucide React** for icons
 
 ---
 
-## Funcionalidades
+## Features
 
-### Autenticação
-- Login com persistência via localStorage
-- Proteção de rotas via `<AuthGuard>` no layout autenticado
-- Logout completo (invalida token no backend)
+### Authentication
+- Login with persistence via localStorage
+- Route protection via `<AuthGuard>` in the authenticated layout
+- Full logout (invalidates token on the backend)
 
 ### Dashboard
-- Resumo do mês: recebido, a receber, total atrasado, inadimplentes
-- Lista de inadimplentes com valor devido e dias de atraso
+- Monthly summary: collected, pending, total overdue, defaulters
+- Defaulters list with amount owed and days overdue
 
-### Alunos
-- Lista com busca debounce, filtro de ativos/inativos e paginação
-- Cadastro e edição com validação Zod refletindo regras do backend
-- Detalhe com histórico financeiro e resumo
-- Desativar/reativar/excluir com confirmação
+### Students
+- List with debounced search, active/inactive filter, and pagination
+- Create and edit with Zod validation mirroring backend rules
+- Detail view with financial history and summary
+- Deactivate / reactivate / delete with confirmation
 
-### Mensalidades
-- Lista geral com filtros por status (tabs) e mês (select)
-- Marcar pagamento com modal (data, forma, observações)
-- Desfazer pagamento com confirmação
-- Geração manual de mensalidades do mês (idempotente)
+### Monthly Fees
+- General list with status filters (tabs) and month selector
+- Mark payment with modal (date, method, notes)
+- Undo payment with confirmation
+- Manual generation of monthly fees (idempotent)
 
 ---
 
-## Decisões técnicas
+## Technical decisions
 
 ### Mobile-first
-Toda a UI foi desenhada a partir do mobile e expandida pra desktop com breakpoints. Botões com áreas de toque confortáveis, listas de cards empilhados em vez de tabelas, drawer lateral em vez de sidebar fixa.
+The entire UI was designed from mobile up, expanded to desktop via breakpoints. Comfortable touch targets, stacked card lists instead of tables, a lateral drawer instead of a fixed sidebar.
 
-### Autenticação via localStorage
-Token Bearer salvo no localStorage. Trade-off conhecido (vulnerável a XSS) aceito porque o sistema é interno, com poucos usuários conhecidos, sem dados financeiros reais sendo manipulados e deploy em domínios separados (Vercel + Fly.io) — cookies cross-domain seriam mais complexos. Token expira em 7 dias com prune diário no backend.
+### Authentication via localStorage
+Bearer token stored in localStorage. Known trade-off (vulnerable to XSS) accepted because the system is internal, with a small set of known users, no real financial data being manipulated, and deployment on separate domains (Vercel + Fly.io) — cross-domain cookies would add unnecessary complexity. Token expires in 7 days with daily pruning on the backend.
 
-### URL como source of truth para filtros
-Filtros (busca, status, mês, paginação) ficam na URL via `useSearchParams`. F5 mantém o estado, links são compartilháveis, voltar do browser desfaz filtros naturalmente.
+### URL as source of truth for filters
+Filters (search, status, month, pagination) are stored in the URL via `useSearchParams`. F5 preserves state, links are shareable, and hitting back in the browser naturally undoes filter changes.
 
-### Server Components por padrão
-Apenas componentes que usam state, eventos ou hooks viram Client. Reduz bundle JS e mantém a renderização inicial rápida.
+### Server Components by default
+Only components that use state, events, or hooks become Client Components. This reduces the JS bundle and keeps the initial render fast.
 
-### Componente `<AlunoForm>` reusado entre criar e editar
-Mesmo componente alimentado por `defaultValues` opcionais e callback `onSubmit`. Mapeamento de erros 422 do Laravel pros campos via `setError` do React Hook Form — usuário vê "Telefone já existe" embaixo do campo telefone, não em toast genérico.
+### Reusable `<StudentForm>` component for create and edit
+The same component is fed optional `defaultValues` and an `onSubmit` callback. Laravel 422 errors are mapped to fields via React Hook Form's `setError` — the user sees "Phone already exists" under the phone field, not a generic toast.
 
-### Invalidação de queries hierárquica
-QueryKeys em array tipo `['alunos', 'list', params]`. Permite invalidar tudo de alunos com `invalidateQueries({ queryKey: ['alunos'] })` — afeta lista e detalhe simultaneamente. Marcar pagamento de uma mensalidade atualiza dashboard, listas e detalhes em cadeia.
+### Hierarchical query invalidation
+QueryKeys are structured as arrays like `['students', 'list', params]`. This allows invalidating everything related to students with `invalidateQueries({ queryKey: ['students'] })` — affecting both list and detail simultaneously. Marking a fee as paid updates the dashboard, lists, and details in a chain.
 
 ---
 
-## Como rodar local
+## Running locally
 
-### Pré-requisitos
+### Prerequisites
 - Node.js 20+
-- Backend rodando ([fighthouse-api](https://github.com/Kuligowskilucas/fighthouse-api))
+- Backend running ([fighthouse-api](https://github.com/Kuligowskilucas/fighthouse-api))
 
-### Instalação
+### Installation
 
 ```bash
 git clone https://github.com/Kuligowskilucas/fighthouse-web.git
@@ -93,58 +93,58 @@ cd fighthouse-web
 npm install
 ```
 
-### Variáveis de ambiente
+### Environment variables
 
-Cria o arquivo `.env.local` na raiz:
+Create a `.env.local` file at the project root:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost
 ```
 
-### Rodar em dev
+### Start dev server
 
 ```bash
 npm run dev
 ```
 
-Acessa em http://localhost:3000.
+Open http://localhost:3000 in your browser.
 
 ---
 
-## Estrutura
+## Project structure
 
 ```
 src/
-app/
-(auth)/login/         # Rota não autenticada
-(app)/                # Rotas protegidas (AuthGuard no layout)
-dashboard/
-alunos/
-mensalidades/
-layout.tsx            # Root layout com Providers
-not-found.tsx         # 404 customizado
-error.tsx             # Error boundary global
-components/
-ui/                   # Componentes shadcn
-*.tsx                 # Componentes do domínio
-hooks/                  # Hooks customizados (TanStack Query)
-lib/                    # Utilitários e cliente HTTP
-schemas/                # Schemas Zod
-types/                  # Interfaces TypeScript
+  app/
+    (auth)/login/         # Unauthenticated route
+    (app)/                # Protected routes (AuthGuard in layout)
+      dashboard/
+      students/
+      fees/
+    layout.tsx            # Root layout with Providers
+    not-found.tsx         # Custom 404
+    error.tsx             # Global error boundary
+  components/
+    ui/                   # shadcn components
+    *.tsx                 # Domain components
+  hooks/                  # Custom hooks (TanStack Query)
+  lib/                    # Utilities and HTTP client
+  schemas/                # Zod schemas
+  types/                  # TypeScript interfaces
 ```
 
 ---
 
 ## Roadmap
 
-### v1 (em desenvolvimento)
-- [x] CRUD de alunos
-- [x] Gestão de mensalidades
-- [x] Dashboard mensal
-- [x] Geração manual de mensalidades
-- [ ] Tela de trocar senha
-- [ ] Deploy (Fly.io + Vercel + Neon Postgres)
+### v1 (in development)
+- [x] Student CRUD
+- [x] Monthly fee management
+- [x] Monthly dashboard
+- [x] Manual fee generation
+- [ ] Change password screen
+- [ ] Deployment (Fly.io + Vercel + Neon Postgres)
 
-### v2 (futuro)
-- [ ] Notificações por email para inadimplentes
-- [ ] Reset de senha por email
+### v2 (future)
+- [ ] Email notifications for defaulters
+- [ ] Password reset via email
