@@ -6,6 +6,9 @@ export interface Plano {
   valor: number;
   frequencia_semanal: number | null;
   ativo: boolean;
+  dias_semana: string | null;       
+  horarios: string[];               
+  alunos_count?: number;            
 }
 
 export interface Aluno {
