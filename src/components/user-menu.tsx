@@ -1,17 +1,13 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import { LayoutDashboard, LogOut, User, Users, Wallet } from 'lucide-react';
+import { LayoutDashboard, LayoutGrid, LogOut, User, Users, Wallet } from 'lucide-react'
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import {
-  Sheet, SheetContent, SheetDescription,
-  SheetHeader, SheetTitle, SheetTrigger,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/use-auth';
 import { api } from '@/lib/api';
 
@@ -65,6 +61,7 @@ export function UserMenu({ trigger }: UserMenuProps) {
             <>
               <NavLink href="/alunos" label="Alunos" icon={Users} onClick={() => setOpen(false)} />
               <NavLink href="/mensalidades" label="Mensalidades" icon={Wallet} onClick={() => setOpen(false)} />
+              <NavLink href="/planos" label="Planos" icon={LayoutGrid} onClick={() => setOpen(false)} />
             </>
           )}
 

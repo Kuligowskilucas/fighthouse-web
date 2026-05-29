@@ -11,6 +11,12 @@ import { formatCurrency, formatMesReferencia } from '@/lib/format';
 import { ErrorState } from '@/components/error-state';
 import { RoleGuard } from '@/components/role-guard';
 import type { RecebidoHojeItem } from '@/types/dashboard';
+import { usePlanos } from '@/hooks/use-planos'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '@/lib/api'
+import type { Aluno } from '@/types/aluno'
+import TurmaCard from '@/components/turma-card'
+import { LayoutGrid } from 'lucide-react'
 
 const formaPagamentoLabel: Record<string, string> = {
   pix: 'Pix',
@@ -43,11 +49,22 @@ export default function DashboardPage() {
   const inadimplentesQuery = useInadimplentes();
   const recebidosQuery   = useRecebidosHoje();
 
-  if (resumoQuery.isLoading || inadimplentesQuery.isLoading || recebidosQuery.isLoading) {
-    return <DashboardSkeleton />;
+  const planosQuery = usePlanos()
+  const alunosQuery = useQuery({
+    queryKey: ['alunos', 'todos-ativos'],
+    queryFn: async () => {
+      const { data } = await api.get<{ data: Aluno[] }>('/alunos', {
+        params: { ativo: 1, per_page: 999 },
+      })
+      return data.data
+    },
+  })
+
+  if ( resumoQuery.isLoading || inadimplentesQuery.isLoading || recebidosQuery.isLoading || planosQuery.isLoading || alunosQuery.isLoading ) {
+    return <DashboardSkeleton />
   }
 
-  if (resumoQuery.isError || inadimplentesQuery.isError || recebidosQuery.isError) {
+  if ( resumoQuery.isError || inadimplentesQuery.isError || recebidosQuery.isError || planosQuery.isError || alunosQuery.isError ) {
     return (
       <ErrorState
         title="Erro ao carregar dashboard"
@@ -64,6 +81,20 @@ export default function DashboardPage() {
   const resumo         = resumoQuery.data!;
   const inadimplentes  = inadimplentesQuery.data!;
   const recebidos      = recebidosQuery.data!;
+
+  const planos   = planosQuery.data ?? []
+  const alunos   = alunosQuery.data ?? []
+
+  const inadimplenteIds = new Set(inadimplentes.data.map(i => i.aluno.id))
+
+  const alunosPorPlano = alunos.reduce<Record<number, Aluno[]>>((acc, aluno) => {
+    if (!acc[aluno.plano_id]) acc[aluno.plano_id] = []
+    acc[aluno.plano_id].push(aluno)
+    return acc
+  }, {})
+
+  const turmasComHorario = planos.filter(p => p.dias_semana !== null)
+  const planoLivre       = planos.find(p => p.dias_semana === null) ?? null
 
   return (
     <RoleGuard allowedRoles={['admin']}>
@@ -131,32 +162,31 @@ export default function DashboardPage() {
           )}
         </section>
 
-        {/* ── Inadimplentes ── */}
-        <section aria-labelledby="inadimplentes-heading" className="space-y-3">
-          <div className="flex items-baseline justify-between">
-            <h2 id="inadimplentes-heading" className="font-semibold text-gray-900">
-              Inadimplentes
-            </h2>
-            {inadimplentes.data.length > 0 && (
-              <span className="text-xs text-gray-500">
-                {inadimplentes.data.length}{' '}
-                {inadimplentes.data.length === 1 ? 'pessoa' : 'pessoas'}
-              </span>
+        {/* ── Turmas ── */}
+        <section aria-labelledby="turmas-heading" className="space-y-3">
+          <h2 id="turmas-heading" className="font-semibold text-gray-900">
+            Turmas
+          </h2>
+
+          <div className="space-y-3">
+            {turmasComHorario.map(plano => (
+              <TurmaCard
+                key={plano.id}
+                plano={plano}
+                alunos={alunosPorPlano[plano.id] ?? []}
+                inadimplenteIds={inadimplenteIds}
+              />
+            ))}
+
+            {planoLivre && (
+              <TurmaCard
+                plano={planoLivre}
+                alunos={alunosPorPlano[planoLivre.id] ?? []}
+                isLivre
+                inadimplenteIds={inadimplenteIds}
+              />
             )}
           </div>
-
-          {inadimplentes.data.length === 0 ? (
-            <div className="flex items-center gap-3 rounded-md border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-              <AlertCircle className="h-4 w-4 shrink-0 text-gray-400" />
-              <p>Nenhum aluno com mensalidade em atraso. 🎉</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {inadimplentes.data.map((item) => (
-                <InadimplenteRow key={item.aluno.id} item={item} />
-              ))}
-            </div>
-          )}
         </section>
       </div>
     </RoleGuard>
