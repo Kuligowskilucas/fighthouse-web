@@ -72,3 +72,11 @@ export function gerarOpcoesMeses(): Array<{ value: string; label: string }> {
 
   return meses;
 }
+
+export function shiftReferencia(referencia: string, delta: number): string {
+  const [ano, mes] = referencia.split('-').map(Number);
+  const total = ano * 12 + (mes - 1) + delta;
+  const novoAno = Math.floor(total / 12);
+  const novoMes = (total % 12) + 1;
+  return `${novoAno}-${String(novoMes).padStart(2, '0')}`;
+}

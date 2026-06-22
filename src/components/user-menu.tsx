@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import { LayoutDashboard, LayoutGrid, LogOut, User, Users, Wallet } from 'lucide-react'
+import { CalendarCheck, LayoutDashboard, ClipboardList, LogOut, User, Users, Wallet } from 'lucide-react'
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -53,7 +53,10 @@ export function UserMenu({ trigger }: UserMenuProps) {
         <nav className="flex flex-col gap-1 px-2">
           {/* Dashboard — só admin */}
           {isAdmin && (
-            <NavLink href="/dashboard" label="Dashboard" icon={LayoutDashboard} onClick={() => setOpen(false)} />
+            <>
+              <NavLink href="/dashboard" label="Dashboard" icon={LayoutDashboard} onClick={() => setOpen(false)} />
+              <NavLink href="/dashboard/ciclo" label="Fechamento" icon={CalendarCheck} onClick={() => setOpen(false)} />
+            </>
           )}
 
           {/* Alunos e Mensalidades — admin e professor */}
@@ -61,7 +64,7 @@ export function UserMenu({ trigger }: UserMenuProps) {
             <>
               <NavLink href="/alunos" label="Alunos" icon={Users} onClick={() => setOpen(false)} />
               <NavLink href="/mensalidades" label="Mensalidades" icon={Wallet} onClick={() => setOpen(false)} />
-              <NavLink href="/planos" label="Planos" icon={LayoutGrid} onClick={() => setOpen(false)} />
+              <NavLink href="/planos" label="Planos" icon={ClipboardList} onClick={() => setOpen(false)} />
             </>
           )}
 

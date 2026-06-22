@@ -1,13 +1,15 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 
 import type {
   DashboardResumo,
+  CicloResumo,
   InadimplentesResponse,
   RecebidosHojeResponse,
 } from '@/types/dashboard';
+
 
 export function useDashboardResumo() {
   return useQuery({
@@ -40,5 +42,18 @@ export function useRecebidosHoje() {
       );
       return data;
     },
+  });
+}
+
+export function useCicloResumo(periodo?: string) {
+  return useQuery({
+    queryKey: ['dashboard', 'ciclo', periodo ?? 'atual'],
+    queryFn: async (): Promise<CicloResumo> => {
+      const { data } = await api.get<CicloResumo>('/dashboard/ciclo', {
+        params: periodo ? { periodo } : undefined,
+      });
+      return data;
+    },
+    placeholderData: keepPreviousData,
   });
 }

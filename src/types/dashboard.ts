@@ -58,3 +58,26 @@ export interface RecebidosHojeResponse {
   total_recebido: number;
   quantidade: number;
 }
+
+export interface CicloPagante {
+  id: number;
+  aluno_id: number;
+  aluno: { id: number; nome: string };
+  mes_referencia: string;
+  valor: number;
+  data_pagamento: string;
+  forma_pagamento: 'pix' | 'dinheiro' | 'cartao' | 'transferencia' | 'mercado_pago' | null;
+}
+
+export interface CicloResumo {
+  periodo: {
+    referencia: string;   
+    inicio: string;       
+    fim: string;          
+    tem_anterior: boolean;
+    tem_proximo: boolean;
+  };
+  total_recebido: number;
+  quantidade: number;
+  pagantes: CicloPagante[];
+}
