@@ -124,11 +124,12 @@ export default function MensalidadesPage() {
     updateParams({ page: String(novaPage) });
   }
 
-  const { data, isLoading, isError, refetch } = useMensalidadesList({
-    status: tabConfig.status,
-    mes_referencia: mes,
-    page,
-  });
+const { data, isLoading, isError, refetch } = useMensalidadesList({
+  status: tabConfig.status,
+  mes_referencia: mes,
+  ativo: true,
+  page,
+});
 
   return (
     <RoleGuard allowedRoles={['admin', 'professor']}>

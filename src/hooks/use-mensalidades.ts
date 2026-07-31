@@ -66,6 +66,7 @@ export interface MensalidadesListParams {
   status?: StatusMensalidade;
   mes_referencia?: string;
   aluno_id?: number;
+  ativo?: boolean;
   page?: number;
   per_page?: number;
 }
