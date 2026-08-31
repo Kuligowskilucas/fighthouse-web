@@ -15,7 +15,7 @@ The API this frontend consumes is available at [fighthouse-api](https://github.c
 
 ## About the project
 
-Fight House Club is a jiu-jitsu gym whose owner, Marquete, currently manages monthly fees for ~30 students using a physical notebook. This project is a free digital alternative, built with absolute priority on mobile usage — Marquete will use it on his phone far more than on a desktop.
+Fight House Club is a jiu-jitsu gym whose owner, Marquete, currently manages monthly fees for ~60 students using a physical notebook. This project is a free digital alternative, built with absolute priority on mobile usage — Marquete will use it on his phone far more than on a desktop.
 
 ---
 
