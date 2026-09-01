@@ -135,16 +135,15 @@ src/
 
 ---
 
+## Status
+
+In production since May 2026, in daily use by the academy owner. Deployed on
+Oracle Cloud (API) and Vercel (frontend), with managed PostgreSQL on Supabase.
+
 ## Roadmap
 
-### v1 (in development)
-- [x] Student CRUD
-- [x] Monthly fee management
-- [x] Monthly dashboard
-- [x] Manual fee generation
-- [ ] Change password screen
-- [ ] Deployment (Fly.io + Vercel + Neon Postgres)
+Shipped in v1: student CRUD, monthly fee management, financial dashboard,
+manual fee generation, password change, deployment.
 
-### v2 (future)
-- [ ] Email notifications for defaulters
-- [ ] Password reset via email
+Planned: email notifications for overdue students, password reset by email,
+Mercado Pago integration for direct payment.
